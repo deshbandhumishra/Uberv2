@@ -1,6 +1,6 @@
 name := "Uberv2"
 
-version := "0.1"
+version := "0.2"
 
 scalaVersion := "2.12.8" // don't use 2.12.3, throw Exceptions
 libraryDependencies += "org.apache.spark" %% "spark-core" % "3.0.0"

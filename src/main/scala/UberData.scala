@@ -7,7 +7,7 @@ import org.apache.spark.ml.clustering.KMeans
 object UberData extends App {
 
   case class Uber(dt: String, lat: Double, lon: Double, base: String) extends Serializable
-  var file1: String = "/home/deshbandhu/MCIT_BigData/Uberv2/resource/uber.csv"
+  var file: String = "/home/deshbandhu/MCIT_BigData/Uberv2/resource/uber.csv"
 
   val schema = StructType(Array(
     StructField("dt", TimestampType, nullable = true),
@@ -18,7 +18,7 @@ object UberData extends App {
 
 
   val spark: SparkSession = SparkSession.builder().master("local[*]").appName("uber").getOrCreate()
-  val df: DataFrame = spark.read.option("inferSchema", "false").schema(schema).option("header", "false").csv(file1)
+  val df: DataFrame = spark.read.option("inferSchema", "false").schema(schema).option("header", "false").csv(file)
 
   val featureCols = Array("lat", "lon")
   val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
