@@ -1,4 +1,3 @@
-
 import org.apache.spark.sql.{SparkSession, _}
 import org.apache.spark.sql.types.{TimestampType, _}
 import org.apache.spark.ml.feature.VectorAssembler
@@ -6,7 +5,7 @@ import org.apache.spark.ml.clustering.KMeans
 
 object UberData extends App {
 
-  case class Uber(dt: String, lat: Double, lon: Double, base: String) extends Serializable
+  //case class Uber(dt: String, lat: Double, lon: Double, base: String) extends Serializable
   var file: String = "/home/deshbandhu/MCIT_BigData/Uberv2/resource/uber.csv"
 
   val schema = StructType(Array(
@@ -19,7 +18,7 @@ object UberData extends App {
 
   val spark: SparkSession = SparkSession.builder().master("local[*]").appName("uber").getOrCreate()
   val df: DataFrame = spark.read.option("inferSchema", "false").schema(schema).option("header", "false").csv(file)
-
+  df.persist()//To avoid inconsistency in randomSplit()
   val featureCols = Array("lat", "lon")
   val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
   val df2 = assembler.transform(df)
