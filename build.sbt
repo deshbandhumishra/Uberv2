@@ -10,5 +10,7 @@ libraryDependencies += "org.apache.spark" %% "spark-mllib" % "3.0.0"// % "runtim
 // libraryDependencies += "org.apache.spark" %% "spark-mllib-local" % "3.0.0"
 
 resolvers += "Cloudera" at "http://repository.cloudera.com/artifactory/cloudera-repos/"
-
-
+enablePlugins(JavaAppPackaging)
+enablePlugins(DockerPlugin)
+mainClass in compile := Some("UberData")
+//src.main.scala can be excluded from package name, after that everything should be included
