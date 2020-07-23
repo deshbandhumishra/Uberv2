@@ -1,13 +1,15 @@
-import org.apache.spark.sql.{SparkSession, _}
-import org.apache.spark.sql.types.{TimestampType, _}
-import org.apache.spark.ml.feature.VectorAssembler
+package com.mcit
+
 import org.apache.spark.ml.clustering.KMeans
+import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.sql.types.{TimestampType, _}
+import org.apache.spark.sql.{SparkSession, _}
 
 object UberData extends App {
 
   //case class Uber(dt: String, lat: Double, lon: Double, base: String) extends Serializable
-  var file: String = "/home/deshbandhu/MCIT_BigData/Uberv2/resource/uber.csv"
-
+  //var file: String = "/home/deshbandhu/MCIT_BigData/Uberv2/resource/uber.csv"
+  var file: String = "resource/uber.csv"
   val schema = StructType(Array(
     StructField("dt", TimestampType, nullable = true),
     StructField("lat", DoubleType, nullable = true),
@@ -43,7 +45,8 @@ object UberData extends App {
   spark.sql("select prediction, count(prediction) as count from uber group by prediction").show
 
   spark.sql("SELECT hour(uber.dt) as hr,count(prediction) as ct FROM uber group By hour(uber.dt)").show
- model.write.overwrite().save("/home/deshbandhu/MCIT_BigData/Uberv2/output/savemodel")
+ model.write.overwrite().save("output/savemodel")
   val res = spark.sql("select dt, lat, lon, base, prediction as cid FROM uber order by dt")
-  res.write.format("json").save("/home/deshbandhu/MCIT_BigData/Uberv2/output/uber.json")
+   res.write.mode(SaveMode.Overwrite).format("json").save("output/uber.json")
+
 }
