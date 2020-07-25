@@ -45,8 +45,8 @@ object UberData extends App {
   spark.sql("select prediction, count(prediction) as count from uber group by prediction").show
 
   spark.sql("SELECT hour(uber.dt) as hr,count(prediction) as ct FROM uber group By hour(uber.dt)").show
- model.write.overwrite().save("model")
+ model.write.overwrite().save("resource/model")
   val res = spark.sql("select dt, lat, lon, base, prediction as cid FROM uber order by dt")
-   res.write.format("json").save("sqlquery")
+   res.write.mode("overwrite").format("json").save("resource/sqlquery")
 
 }
