@@ -1,20 +1,17 @@
 package com.mcit
 import java.io.FileReader
-import java.util.Properties
+import java.util.{Collections, Properties}
 
-import org.apache.kafka.clients.producer._
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import modelClass.UberRecordJSON
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
+import org.apache.kafka.clients.producer._
 import org.apache.kafka.common.errors.TopicExistsException
-import java.util.Collections
-
-import modelClass.UberRecordJSON//RecordJSON//RecordJSON
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 
 import scala.util.Try
 
-object Producer extends App {
-  val configFileName ="resource/ConfluentKafkaCloud.config" //args(0)
+object Producer {
+  val configFileName = "resource/ConfluentKafkaCloud.config" //args(0)
   val topicName = "uber-test1"
   val MAPPER = new ObjectMapper
   val props = buildProperties(configFileName)
@@ -25,20 +22,37 @@ object Producer extends App {
     override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
       Option(exception) match {
         case Some(err) => println(s"Failed to produce: $err")
-        case None =>  println(s"Produced record at $metadata")
+        case None => println(s"Produced record at $metadata")
       }
     }
   }
 
-  for( i <- 1 to 10) {
-    val countRecord: UberRecordJSON = new UberRecordJSON(i.toString,10.0D,10.0D,"base")
+def sendData(data:org.apache.spark.sql.DataFrame):Unit = {
+  println("=====================================================================Sending")
+  //  val countRecord: UberRecordJSON = new UberRecordJSON(i.toString, 10.0D, 10.0D, "base")
+  val mydata = data.select("dt", "lat", "lon", "base").toJavaRDD
+  //mydata.show(10)
+  for (x <- mydata) {
+    println(x.get(0) + " " + x.get(1) + "  " + x.get(2) + "  " + x.get(3))
+
+    val uberRecord = new UberRecordJSON(Option(x.get(0).toString), Option(x.get(1)), Option(x.get(2)), Option(x.get(3).toString))
     val key: String = "uber-key"
-    val value: JsonNode = MAPPER.valueToTree(countRecord)
+    val value: JsonNode = MAPPER.valueToTree(uberRecord)
+    println("============================================="+value)
     val record = new ProducerRecord[String, JsonNode](topicName, key, value)
-    producer.send(record, callback)
+   producer.send(record, callback)
   }
+}
+ // mydata.show(10)
+//mydata.toJavaRDD.map(x=>x)
+
+/*
+*
+* */
+
+
   producer.flush()
-  producer.close()
+  //producer.close()
   println("Wrote ten records to " + topicName)
 
   def buildProperties(configFileName: String): Properties = {
@@ -60,3 +74,5 @@ object Producer extends App {
     adminClient.close()
   }
 }
+
+
