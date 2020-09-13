@@ -1,7 +1,6 @@
 import sbt.Keys.{libraryDependencies, scalaVersion}
 version := "0.2"
 
-lazy val UberConsumer = project in file("UberConsumer")
 lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
@@ -30,7 +29,7 @@ lazy val root = (project in file(".")).
       "org.apache.kafka" % "connect-runtime" % "2.4.0",
       "org.apache.kafka" % "kafka-streams" % "2.4.0",
       "org.apache.kafka" %% "kafka-streams-scala" % "2.4.0",
-      "com.fasterxml.jackson.core" % "jackson-databind" % "2.8.5",
+
 
       "io.confluent" % "kafka-json-serializer" % "5.0.1",
       "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar") // this is a workaround for https://github.com/jax-rs/api/issues/571
