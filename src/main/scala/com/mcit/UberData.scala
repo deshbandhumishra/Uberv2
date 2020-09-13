@@ -5,7 +5,9 @@ import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.sql.types.{TimestampType, _}
 import org.apache.spark.sql.{SparkSession, _}
 
-object UberData extends App {
+object UberData {
+
+  println("==============================================Under producer.....")
 
   case class Uber(dt: String, lat: Double, lon: Double, base: String) extends Serializable
   var file: String = "resource/uber.csv"
@@ -20,13 +22,9 @@ object UberData extends App {
   val spark: SparkSession = SparkSession.builder().master("local[*]").appName("uber").getOrCreate()
   val df: DataFrame = spark.read.option("inferSchema", "false").schema(schema).option("header", "false").csv(file)
 
-  val tRDD: org.apache.spark.sql.DataFrame = df
-
-        Producer.sendData(tRDD)
-
+       Producer.sendData(df)
 
  // Producer.sendData(tRDD)
-
 
   df.persist()//To avoid inconsistency in randomSplit()
   val featureCols = Array("lat", "lon")

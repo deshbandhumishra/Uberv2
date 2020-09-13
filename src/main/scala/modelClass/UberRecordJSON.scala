@@ -1,10 +1,15 @@
 package modelClass
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 class UberRecordJSON {
    var dt:String=""
    var lat:Any =0D
    var lon:Any =0D
    var base:String=""
+
+
 
   def this(dt: Option[String], lat:Option[Any], lon: Option[Any], base:Option[String])
   {

@@ -11,7 +11,7 @@ import org.apache.kafka.common.errors.TopicExistsException
 import scala.util.Try
 
 object Producer {
-  val configFileName = "resource/ConfluentKafkaCloud.config" //args(0)
+  val configFileName = "resource/ConfluentKafkaCloud.config"
   val topicName = "uber-test1"
   val MAPPER = new ObjectMapper
   val props = buildProperties(configFileName)
@@ -27,28 +27,18 @@ object Producer {
     }
   }
 
-def sendData(data:org.apache.spark.sql.DataFrame):Unit = {
+def sendData( data:org.apache.spark.sql.DataFrame):Unit = {
   println("=====================================================================Sending")
-  //  val countRecord: UberRecordJSON = new UberRecordJSON(i.toString, 10.0D, 10.0D, "base")
-  val mydata = data.select("dt", "lat", "lon", "base").toJavaRDD
-  //mydata.show(10)
-  for (x <- mydata) {
-    println(x.get(0) + " " + x.get(1) + "  " + x.get(2) + "  " + x.get(3))
 
+  val mydata = data.select("dt", "lat", "lon", "base").toJavaRDD
+  for (x <- mydata) {
     val uberRecord = new UberRecordJSON(Option(x.get(0).toString), Option(x.get(1)), Option(x.get(2)), Option(x.get(3).toString))
     val key: String = "uber-key"
     val value: JsonNode = MAPPER.valueToTree(uberRecord)
-    println("============================================="+value)
     val record = new ProducerRecord[String, JsonNode](topicName, key, value)
    producer.send(record, callback)
   }
 }
- // mydata.show(10)
-//mydata.toJavaRDD.map(x=>x)
-
-/*
-*
-* */
 
 
   producer.flush()
@@ -62,6 +52,7 @@ def sendData(data:org.apache.spark.sql.DataFrame):Unit = {
     properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.connect.json.JsonSerializer")
     properties
   }
+
 //You can delete this function after running atleast once to create the topic.
   def createTopic(topic: String, partitions: Int, replication: Int, cloudConfig: Properties): Unit = {
     val newTopic = new NewTopic(topic, partitions, replication.toShort)
